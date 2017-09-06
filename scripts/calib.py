@@ -1,12 +1,7 @@
-#!/usr/bin/python
-
 # Imports
-import os, sys, glob
 import cv2
-import numpy as np
+import os, sys, glob
 
-# Image as argument
-frame = str(sys.argv)
+def basic_detector():
 
-# Read Image
-im = cv2.imread (frame, cv2.IMREAD_GRAYSCALE)
+
