@@ -48,10 +48,10 @@ while (True):
 # Resize the image according to the default size
     height, width = frame.shape[:2]
 
-#    if (height * width >= defaultHeight * defaultWidth):
-#        frame = frame.resize (defaultHeight, defaultWidth, cv2.INTER_AREA)
-#    else:
-#        frame = frame.resize (defaultHeight, defaultWidth, cv2.INTER_LINEAR)
+    if (height * width >= defaultHeight * defaultWidth):
+        frame = frame.resize (defaultHeight, defaultWidth, cv2.INTER_AREA)
+    else:
+        frame = frame.resize (defaultHeight, defaultWidth, cv2.INTER_LINEAR)
 
     hsv  = cv2.cvtColor (frame, cv2.COLOR_BGR2HSV)
 
