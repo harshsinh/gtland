@@ -33,6 +33,7 @@ void cb(const std_msgs::UInt32& ypr) {
 ros::Subscriber<std_msgs::UInt32> sub("ypr", &cb);
 
 void setup() {
+    Serial.begin(57600);
     pinMode(ypin, OUTPUT);
     pinMode(ppin, OUTPUT);
     pinMode(rpin, OUTPUT);
