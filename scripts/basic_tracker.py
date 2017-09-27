@@ -12,23 +12,25 @@ import imutils
 def nothing(x):
     pass
 
+CALIB_MODE = False
+
 # Argument parser
 ap = argparse.ArgumentParser()
-ap.add_argument("-v", "--video", help = "path to the (optional) video file")
-ap.add_argument("-b", "--buffer", type = int, default = 64, help = "max buffer size")
-ap.add_argument("-c", "--calibration", help = "start in calibration mode")
+ap.add_argument ("-v", "--video",  help = "path to the (optional) video file")
+ap.add_argument ("-b", "--buffer", type = int, default = 64, help = "max buffer size")
+ap.add_argument ("-c", "--calibration", help = "start in calibration mode")
 args = vars(ap.parse_args())
 
 # The default values are for the postits
 cv2.namedWindow('Color Range')
-cv2.createTrackbar('Blue Low', 'Color Range', 12, 255, nothing)
-cv2.createTrackbar('Green Low', 'Color Range', 45, 255, nothing)
-cv2.createTrackbar('Red Low', 'Color Range', 100, 255, nothing)
-cv2.createTrackbar('Blue High', 'Color Range', 41, 255, nothing)
-cv2.createTrackbar('Green High', 'Color Range', 202, 255, nothing)
-cv2.createTrackbar('Red High', 'Color Range', 255, 255, nothing)
+cv2.createTrackbar('Blue Low',  'Color Range', 12, 255,  nothing)
+cv2.createTrackbar('Green Low', 'Color Range', 45, 255,  nothing)
+cv2.createTrackbar('Red Low',   'Color Range', 100, 255, nothing)
+cv2.createTrackbar('Blue High', 'Color Range', 41, 255,  nothing)
+cv2.createTrackbar('Green High','Color Range', 202, 255, nothing)
+cv2.createTrackbar('Red High',  'Color Range', 255, 255, nothing)
 
-color_low = np.array([0, 0, 0])
+color_low  = np.array([0, 0, 0])
 color_high = np.array([250, 105, 50])
 pts = deque(maxlen=args["buffer"])
  
@@ -51,9 +53,9 @@ while True:
     if args.get("video") and not grabbed:
         break
 
-    frame = imutils.resize(frame, width=600)
+    frame   = imutils.resize(frame, width=600)
     blurred = cv2.GaussianBlur(frame, (11, 11), 0)
-    hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
+    hsv     = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
 
     # Blobs
     mask = cv2.inRange(hsv, color_low, color_high)
@@ -63,12 +65,12 @@ while True:
     # Show trackbars and find their position
     # use them to set new threshold
     cv2.imshow("Color Range", mask)
-    bl = cv2.getTrackbarPos("Blue Low", "Color Range")    
+    bl = cv2.getTrackbarPos("Blue Low",  "Color Range")    
     gl = cv2.getTrackbarPos("Green Low", "Color Range")
-    rl = cv2.getTrackbarPos("Red Low", "Color Range")
+    rl = cv2.getTrackbarPos("Red Low",   "Color Range")
     bh = cv2.getTrackbarPos("Blue High", "Color Range")
-    gh = cv2.getTrackbarPos("Green High", "Color Range")
-    rh = cv2.getTrackbarPos("Red High", "Color Range")
+    gh = cv2.getTrackbarPos("Green High","Color Range")
+    rh = cv2.getTrackbarPos("Red High",  "Color Range")
     color_low = np.array([bl, gl, rl])
     color_high= np.array([bh, gh, rh])
 
