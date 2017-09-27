@@ -113,7 +113,12 @@ while True:
 	# show the frame to our screen
     cv2.imshow("Frame", frame)
     key = cv2.waitKey(1) & 0xFF
- 
+
+    # if the 's' key is pressed, store the trackbar values.
+    if key == ord('s'):
+        f = open(datetime.datetime.now().strftime ("%Y%m%d%H%M"), 'w')
+        f.write(bl + ' ' + gl + ' ' + rl + ' ' + bh + ' ' + gh + ' ' + rh)
+        f.close()
 	# if the 'q' key is pressed, stop the loop
     if key == ord("q"):
 		break
