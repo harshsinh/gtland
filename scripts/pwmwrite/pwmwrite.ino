@@ -1,9 +1,9 @@
 #include <ros.h>
 #include <std_msgs/UInt32.h>
 
-#define yawmask 16711680
-#define pitchmask 65280
-#define rollmask 255
+long yawmask = 16711680;
+long pitchmask = 65280;
+long rollmask = 255;
 
 int yawpwm = 0;
 int pitchpwm = 0;
@@ -16,15 +16,15 @@ int rpin = 4;
 ros::NodeHandle nh;
 
 void cb(const std_msgs::UInt32& ypr) {
-    yawpwm      = ypr & yawmask;
-    pitchpwm    = ypr & pitchmask;
-    rollpwm     = ypr & rollmask;
+    yawpwm      = ypr.data & yawmask;
+    pitchpwm    = ypr.data & pitchmask;
+    rollpwm     = ypr.data & rollmask;
 
     analogWrite(ypin, yawpwm);
     analogWrite(ppin, pitchpwm);
     analogWrite(rpin, rollpwm);
 
-    Serial.print("ypr : "):
+    Serial.print("ypr : ");
     Serial.print(yawpwm);
     Serial.print(pitchpwm);
     Serial.println(rollpwm);
