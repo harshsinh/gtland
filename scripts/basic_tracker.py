@@ -7,6 +7,7 @@ from collections import deque
 import numpy as np
 import cv2
 import imutils
+import datetime
 
 # placeholder function
 def nothing(x):
@@ -89,11 +90,11 @@ while True:
         M = cv2.moments(c)
         center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
         # only proceed if the radius meets a minimum size
-        if radius > 10:
+        if radius > 5:
             # draw the circle and centroid on the frame,
             # then update the list of tracked points
             dist = 3500.0/(int(radius))
-            cv2.putText(frame, "distance : " + str(dist),
+            cv2.putText(frame, "distance : " + str(int(dist)),
                         (int(x - radius), int(y - radius)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, 0, 2)
             cv2.circle(frame, (int(x), int(y)), int(radius), (0, 255, 255), 2)
             cv2.circle(frame, center, 5, (0, 0, 255), -1)
