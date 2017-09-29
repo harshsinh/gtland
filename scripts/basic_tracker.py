@@ -118,7 +118,7 @@ while True:
 
     # if the 's' key is pressed, store the trackbar values.
     if key == ord('s'):
-        f = open(datetime.datetime.now().strftime ("%Y%m%d%H%M"), 'w')
+        f = open('../utils/trackbars/' + datetime.datetime.now().strftime("%Y%m%d%H%M"), 'w')
         f.write(str(bl) + ' ' + str(gl) + ' ' + str(rl) + ' ' + str(bh) + ' ' + str(gh) + ' ' + str(rh))
         f.close()
 	# if the 'q' key is pressed, stop the loop
