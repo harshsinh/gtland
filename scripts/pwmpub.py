@@ -1,3 +1,7 @@
+#####################################
+###  PWM Publish on three chanels ###
+#####################################
+
 #!/usr/bin/ python
 import rospy
 from std_msgs.msg import UInt32
