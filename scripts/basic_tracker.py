@@ -1,26 +1,47 @@
 #!/usr/bin python
-
-# Imports
-import os, sys, glob
+################################################################################
+# Code for Object tracking
+################################################################################
+########## Imports
 import argparse
+import datetime
+import glob
+import os
+import sys
 from collections import deque
-import numpy as np
 import cv2
 import imutils
-import datetime
+import numpy as np
+import rospy
+from geometry_msgs.msg import Pose
 
-# placeholder function
-def nothing(x):
-    pass
-
-CALIB_MODE = False
-
-# Argument parser
+################################################################################
+########## Argument parser
 ap = argparse.ArgumentParser()
 ap.add_argument ("-v", "--video",  help = "path to the (optional) video file")
 ap.add_argument ("-b", "--buffer", type = int, default = 64, help = "max buffer size")
-ap.add_argument ("-c", "--calibration", help = "start in calibration mode")
+ap.add_argument ("-c", "--calibration", help = "read the calibration file")
 args = vars(ap.parse_args())
+
+################################################################################
+########## ROS Things
+# ROS Publisher
+pub = rospy.Publisher('/camera_pose', Pose, queue_size=100)
+
+################################################################################
+########## Calibration Things
+# Read the default calibration file if not supplied
+calibfile = "../utils/calibfiles/default"
+if not args.get("calibration", False):
+    calibfile = args["calibration"]
+file = open(calibfile, "r")
+lines = file.readlines()
+
+################################################################################
+########### Trackbar things
+# placeholder function for trackbar draw
+def nothing(x):
+    pass
 
 # The default values are for the postits
 cv2.namedWindow('Color Range')
@@ -31,22 +52,22 @@ cv2.createTrackbar('Blue High', 'Color Range', 41, 255,  nothing)
 cv2.createTrackbar('Green High','Color Range', 202, 255, nothing)
 cv2.createTrackbar('Red High',  'Color Range', 255, 255, nothing)
 
+# Original Default color thresolds
 color_low  = np.array([0, 0, 0])
 color_high = np.array([250, 105, 50])
 pts = deque(maxlen=args["buffer"])
 
-# if a video path was not supplied, grab the reference
-# to the webcam, do calibration only in this case
+################################################################################
+########## Open video file is specified or open camera
+
 if not args.get("video", False):
     camera = cv2.VideoCapture(0)
-    if args.get("calibration", False):
-        CALIB_MODE = True
 
 # otherwise, grab a reference to the video file
 else:
     camera = cv2.VideoCapture(args["video"])
-
-# keep looping
+################################################################################
+########## The main loop
 while True:
     (grabbed, frame) = camera.read()
 
@@ -125,6 +146,7 @@ while True:
     if key == ord("q"):
 		break
 
+################################################################################
 # cleanup the camera and close any open windows
 camera.release()
 cv2.destroyAllWindows()
