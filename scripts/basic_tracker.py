@@ -30,15 +30,15 @@ args = vars(ap.parse_args())
 pub = rospy.Publisher('/camera_pose', Pose, queue_size=100)
 
 ################################################################################
-########## Calibration Things
+########## Calibration Things TODO
 # Read the default calibration file if not supplied
-calibfile = "../utils/calibfiles/default"
-if not args.get("calibration", False):
-    calibfile = args["calibration"]
-file = open(calibfile, "r")
-lines = file.readlines()
-# get value for the f, cx, and cy
-f = lines[1].split().[2]
+# calibfile = "../utils/calibfiles/default"
+# if not args.get("calibration", False):
+#     calibfile = args["calibration"]
+# file = open(calibfile, "r")
+# lines = file.readlines()
+# # get value for the f, cx, and cy
+# f = lines[1].split().[2]
 
 ################################################################################
 ########### Trackbar things
@@ -147,7 +147,7 @@ while True:
         f.close()
 	# if the 'q' key is pressed, stop the loop
     if key == ord("q"):
-		break
+        break
 
 ################################################################################
 # cleanup the camera and close any open windows
