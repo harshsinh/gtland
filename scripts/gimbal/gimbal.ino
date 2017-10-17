@@ -4,6 +4,7 @@
 
 #include <ros.h>
 #include <Servo.h>
+#include <ypr.h>
 #include <std_msgs/UInt32.h>
 
 /*** Constants for the Gimbal ***/
@@ -49,19 +50,7 @@ float U_pitch_i_prev=0;
 float U_roll_i_prev=0;
 float prev_time = 0;
 
-/*** Constants for the ypr ***/
-long yawmask = 16711680;
-long pitchmask = 65280;
-long rollmask = 255;
-
-int yawpwm = 0;
-int pitchpwm = 0;
-int rollpwm = 0;
-
-int ypin = 2;
-int ppin = 3;
-int rpin = 4;
-
+/*** ROS things ***/
 ros::NodeHandle nh;
 ros::Subscriber<std_msgs::UInt32> sub("yprdesired", &cb);
 ros::Publisher pub;
