@@ -50,27 +50,19 @@ float U_pitch_i_prev=0;
 float U_roll_i_prev=0;
 float prev_time = 0;
 
-/*** ROS things ***/
-ros::NodeHandle nh;
-ros::Subscriber<std_msgs::UInt32> sub("yprdesired", &cb);
-ros::Publisher pub;
-
 Servo Pitch_Servo;
 Servo Roll_Servo;
 
+/*** ROS things ***/
+ros::NodeHandle nh;
+ros::Subscriber<ypr> sub("/yprdesired", &cb);
+ros::Publisher yprpub = nh.advertise<ypr>("/ypr", 100);
+
 void cb(const std_msgs::UInt32& ypr) {
-    yawpwm      = ypr.data & yawmask;
-    pitchpwm    = ypr.data & pitchmask;
-    rollpwm     = ypr.data & rollmask;
 
-    analogWrite(ypin, yawpwm);
-    analogWrite(ppin, pitchpwm);
-    analogWrite(rpin, rollpwm);
-
-    Serial.print("ypr : ");
-    Serial.print(yawpwm);
-    Serial.print(pitchpwm);
-    Serial.println(rollpwm);
+	float yawdesired = ypr.yaw;
+	roll_des = ypr.roll;
+	pitch_des = ypr.pitch;
 }
 
 
@@ -190,13 +182,12 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
 
   if (Serial.available()) {
     SerialReadIMU();
     controlGimbal();
   }
   else Serial.println("#o1");
-
-  //delay(10);
+  nh.spinOnce();
+  delay(1);
 }
