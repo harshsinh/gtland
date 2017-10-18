@@ -2,18 +2,16 @@
 ************* Driver Program for UKF in GTLand ************
 **********************************************************/
 
-#include <bits/stdc++.h>
-#include <UKF_update.h>
-#include <UKF_predict.h>
+#include <update/UKF_update.h>
+#include <predict/UKF_predict.h>
 #include <geometry_msgs/Vector3.h>
 #include <ros.h>
 #include <ypr.h>
 
 double const dt = 1/24.5; // Frequency from the SITL
 
-double x[6];
-double z[3]; // x, y, r based on camera's estimations
-double a[3]; // psi, phi and chi angles from camera prediction
+double x[6] = {0};
+double z[3]; // u, v, r objects location in pixel frame 
 double P[36];
 const double RE[36];
 const double QE[9] = [2*1e-5, 0, 0, 0, 1e-5, 0, 0, 0, 1e-5];
@@ -24,7 +22,7 @@ double cx = 339.639683;
 double cy = 227.812694;
 double f  = (757.324001 +  760.531946)/2;
 
-// TODO: Get Idea what R_actual is
+// radius of the actual ball
 const double R_actual = 0.0212;
 
 bool xinitialized = false;
@@ -33,23 +31,22 @@ ros::NodeHandle nh;
 ros::Publisher gimbal_ang, current_pose, current_velo;
 ros::Subscriber cam_sub;
 
-// Main callback function, all the publishers work here.
+// single callback contains all publishers
 void cam_cb (geometry_msgs::Twist &camera)
 {
-        z[1] = camera.linear.x;
-        z[2] = camera.linear.y;
-        z[0] = camera.linear.z;
-
-        a[0] = camera.anglular.x;
-        a[1] = camera.anglular.y;
-        a[2] = camera.anglular.z;
+  
+	z[1] = camera.linear.x;
+	z[2] = camera.linear.y;
+	z[0] = camera.linear.z;
 
 	// Initialize x with the with the first values from camera
 	if (!xinitialized) {
-		for (int i = 0; i < 3; i++) {
-			x[i] = z[i];
-			x[i + 3] = a[i];
-		}
+		double dist = f*R_actual / z[0];
+		double camz = dist * f / ((z[1] - cx)^2 + (z[2] - cy)^2 + f*f)^0.5;
+		x[0] = (z[1] - cx) * camz / f;
+		x[1] = (z[2] - cy) * camz / f;
+		x[2] = camz;
+
 		xinitialized = true;
 	}
 
@@ -61,27 +58,31 @@ void cam_cb (geometry_msgs::Twist &camera)
 	geometry_msgs::Vector3 position;
 	geometry_msgs::Vector3 velocity;
 
-        position.x = x[0];
-        position.y = x[1];
-        position.z = x[2];
+	position.x = x[0];
+	position.y = x[1];
+	position.z = x[2];
 
-        velocity.x = x[3];
-        velocity.y = x[4];
-        velocity.z = x[5];
+	velocity.x = x[3];
+	velocity.y = x[4];
+	velocity.z = x[5];
 
 	current_pose.publish (position);
 	current_velo.publish (velocity);
 
 	// Publish the desired gimbal angles
-	// TODO: Correct the calculations for Yaw Pitch and Roll desired
-        yaw_desired = asin(x[0]/(x[0]^2+x[2]^2));
-        pitch_desired = asin(x[1]/(x[1]^2+x[2]^2));
+	yaw_desired = asin (x[0] / (x[0]^2 + x[2]^2)^0.5);
+	pitch_desired = asin (x[1] / (x[1]^2 + x[2]^2)^0.5);
+
 	roll_desired = 0;
 
 	ypr desired_angles;
 	desired_angles.yaw = yaw_desired;
 	desired_angles.pitch = pitch_desired;
 	desired_angles.roll = roll_desired;
+
+	gimbal_asetp.publish (desired_angles);
+
+	ros::spinOnce ();
 }
 
 int main (int argc, char** argv)
@@ -93,7 +94,7 @@ int main (int argc, char** argv)
 	current_pose = nh.advertise<geometry_msgs::Vector3>("/current_position", 10);
 	current_velo = nh.advertise<geometry_msgs::Vector3>("/current_velocity", 10);
 
-	cam_sub = nh.Subscribe ("/camera_pose", 10, cam_cb);
+	cam_sub = nh.Subscribe ("/camera_pose", 100, cam_cb);
 
 	ros::Rate loop_rate (100);
 
