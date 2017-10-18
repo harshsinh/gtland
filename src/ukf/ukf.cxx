@@ -34,6 +34,7 @@ ros::Subscriber cam_sub;
 // single callback contains all publishers
 void cam_cb (geometry_msgs::Twist &camera)
 {
+  
 	z[1] = camera.linear.x;
 	z[2] = camera.linear.y;
 	z[0] = camera.linear.z;
@@ -71,6 +72,7 @@ void cam_cb (geometry_msgs::Twist &camera)
 	// Publish the desired gimbal angles
 	yaw_desired = asin (x[0] / (x[0]^2 + x[2]^2)^0.5);
 	pitch_desired = asin (x[1] / (x[1]^2 + x[2]^2)^0.5);
+
 	roll_desired = 0;
 
 	ypr desired_angles;
