@@ -51,11 +51,11 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-add_message_files(
-	DIRECTORY gtland_msgs/msg
-	FILES
-	ypr.msg
-)
+# add_message_files(
+# 	DIRECTORY gtland_msgs/msg
+# 	FILES
+# 	ypr.msg
+# )
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -72,12 +72,12 @@ add_message_files(
 # )
 
 ## Generate added messages and services with any dependencies listed here
-generate_messages(
-	DEPENDENCIES
-	geometry_msgs
-	nav_msgs
-	std_msgs
-)
+# generate_messages(
+# 	DEPENDENCIES
+# 	geometry_msgs
+# 	nav_msgs
+# 	std_msgs
+# )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -134,10 +134,12 @@ include_directories(
 )
 
 ## Declare a C++ library
-# add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/ros_autoquad.cpp
-# )
-
+add_library(ukf_predict
+  src/ukf/predict/UKF_predict.cpp
+)
+add_library(ukf_update
+  src/ukf/update/UKF_update.cpp
+)
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
@@ -146,7 +148,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/ros_autoquad_node.cpp)
+add_executable(QUAD_UKF_node src/ukf.cxx)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -159,9 +161,9 @@ include_directories(
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(${PROJECT_NAME}_node
-#   ${catkin_LIBRARIES}
-# )
+target_link_libraries(QUAD_UKF_node
+  ${catkin_LIBRARIES}
+)
 
 #############
 ## Install ##

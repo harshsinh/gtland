@@ -31,7 +31,7 @@ ros::NodeHandle nh;
 ros::Publisher gimbal_ang, current_pose, current_velo;
 ros::Subscriber cam_sub;
 
-// Main callback function, all the publishers work here.
+// single callback contains all publishers
 void cam_cb (geometry_msgs::Twist &camera)
 {
 	z[1] = camera.linear.x;
