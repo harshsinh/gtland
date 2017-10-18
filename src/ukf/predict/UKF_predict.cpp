@@ -24,13 +24,13 @@
 //
 //  Outputs:
 //    x, P - predicted state and covariance
-// Arguments    : const double x[6]
+// Arguments    : double x[6]
 //                double P[36]
 //                double dt
 //                const double RE[36]
 // Return Type  : void
 //
-void UKF_predict(const double x[6], double P[36], double dt, const double RE[36])
+void UKF_predict(double x[6], double P[36], double dt, const double RE[36])
 {
   emxArray_real_T *X;
   int k;
@@ -424,6 +424,10 @@ void UKF_predict(const double x[6], double P[36], double dt, const double RE[36]
 
   for (k = 0; k < 36; k++) {
     P[k] += RE[k];
+  }
+
+  for (k = 0; k < 6; k++) {
+    x[k] = x_bar[k];
   }
 }
 
