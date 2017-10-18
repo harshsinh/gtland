@@ -8,8 +8,7 @@ project(ros_autoquad)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  cv2
-  cvbridge
+  cv_bridge
   geometry_msgs
   nav_msgs
   roscpp
@@ -113,7 +112,6 @@ catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES ros_autoquad
 	CATKIN_DEPENDS
-	cv2
 	cvbridge
 	geometry_msgs
 	nav_msgs
