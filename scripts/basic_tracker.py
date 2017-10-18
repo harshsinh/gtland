@@ -13,7 +13,7 @@ import cv2
 import imutils
 import numpy as np
 import rospy
-from geometry_msgs.msg import Twist
+from geometry_msgs.msg import Vector3
 
 ################################################################################
 ########## Argument parser
@@ -26,8 +26,10 @@ args = vars(ap.parse_args())
 
 ################################################################################
 ########## ROS Things
-# ROS Publisher
-pub = rospy.Publisher('/camera_pose', Twist, queue_size=100)
+pixel_cord = Vector3(0, 0, 0)
+pub = rospy.Publisher('/camera_pose', Vector3, queue_size=100)
+rospy.init_node('camera_node', anonymous=True)
+rate = rospy.Rate(100)
 
 ################################################################################
 ########### Trackbar things
@@ -107,9 +109,13 @@ while True:
             # draw the circle and centroid on the frame,
             # then update the list of tracked points
             dist = 3500.0/(int(radius))
-            cv2.putText(frame, "distance : " + str(int(diddddddst)),
+            cv2.putText(frame, "distance : " + str(int(dist)),
                         (int(x - radius), int(y - radius)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, 0, 2)
             cv2.circle(frame, (int(x), int(y)), int(radius), (0, 255, 255), 2)
+            pixel_cord.x = int(x)
+            pixel_cord.y = int(y)
+            pixel_cord.z = int(dist)
+            pub.publish(pixel_cord)
             cv2.circle(frame, center, 5, (0, 0, 255), -1)
 
 	# update the points queue

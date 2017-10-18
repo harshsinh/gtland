@@ -22,7 +22,7 @@ double cx = 339.639683;
 double cy = 227.812694;
 double f  = (757.324001 +  760.531946)/2;
 
-// TODO: Get Idea what R_actual is
+// radius of the actual ball
 const double R_actual = 0.0212;
 
 bool xinitialized = false;
@@ -57,27 +57,30 @@ void cam_cb (geometry_msgs::Twist &camera)
 	geometry_msgs::Vector3 position;
 	geometry_msgs::Vector3 velocity;
 
-	position.x = x[1];
-	position.y = x[2];
-	position.z = x[3];
+	position.x = x[0];
+	position.y = x[1];
+	position.z = x[2];
 
-	velocity.x = x[4];
-	velocity.y = x[5];
-	velocity.z = x[6];
+	velocity.x = x[3];
+	velocity.y = x[4];
+	velocity.z = x[5];
 
 	current_pose.publish (position);
 	current_velo.publish (velocity);
 
 	// Publish the desired gimbal angles
-	// TODO: Correct the calculations for Yaw Pitch and Roll desired
-	yaw_desired = 0;
-	pitch_desired = 0;
+	yaw_desired = asin (x[0] / (x[0]^2 + x[2]^2)^0.5);
+	pitch_desired = asin (x[1] / (x[1]^2 + x[2]^2)^0.5);
 	roll_desired = 0;
 
 	ypr desired_angles;
 	desired_angles.yaw = yaw_desired;
 	desired_angles.pitch = pitch_desired;
 	desired_angles.roll = roll_desired;
+
+	gimbal_asetp.publish (desired_angles);
+
+	ros::spinOnce ();
 }
 
 int main (int argc, char** argv)
