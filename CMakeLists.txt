@@ -163,6 +163,8 @@ add_executable(gtland_ukf src/ukf/ukf.cxx)
 ## Specify libraries to link a library or executable target against
 target_link_libraries(gtland_ukf
   ${catkin_LIBRARIES}
+	ukf_predict
+	ukf_update
 )
 
 #############
