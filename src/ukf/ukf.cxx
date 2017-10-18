@@ -36,13 +36,13 @@ ros::Subscriber cam_sub;
 // Main callback function, all the publishers work here.
 void cam_cb (geometry_msgs::Twist &camera)
 {
-	z[1] = camera.linear.x;
-	z[2] = camera.linear.y;
-	z[3] = camera.linear.z;
+        z[1] = camera.linear.x;
+        z[2] = camera.linear.y;
+        z[0] = camera.linear.z;
 
-	a[1] = camera.anglular.x;
-	a[2] = camera.anglular.y;
-	a[3] = camera.anglular.z;
+        a[0] = camera.anglular.x;
+        a[1] = camera.anglular.y;
+        a[2] = camera.anglular.z;
 
 	// Initialize x with the with the first values from camera
 	if (!xinitialized) {
@@ -61,21 +61,21 @@ void cam_cb (geometry_msgs::Twist &camera)
 	geometry_msgs::Vector3 position;
 	geometry_msgs::Vector3 velocity;
 
-	position.x = x[1];
-	position.y = x[2];
-	position.z = x[3];
+        position.x = x[0];
+        position.y = x[1];
+        position.z = x[2];
 
-	velocity.x = x[4];
-	velocity.y = x[5];
-	velocity.z = x[6];
+        velocity.x = x[3];
+        velocity.y = x[4];
+        velocity.z = x[5];
 
 	current_pose.publish (position);
 	current_velo.publish (velocity);
 
 	// Publish the desired gimbal angles
 	// TODO: Correct the calculations for Yaw Pitch and Roll desired
-	yaw_desired = 0;
-	pitch_desired = 0;
+        yaw_desired = asin(x[0]/(x[0]^2+x[2]^2));
+        pitch_desired = asin(x[1]/(x[1]^2+x[2]^2));
 	roll_desired = 0;
 
 	ypr desired_angles;
