@@ -2,7 +2,6 @@
 ************* Driver Program for UKF in GTLand ************
 **********************************************************/
 
-#include <bits/stdc++.h>
 #include <update/UKF_update.h>
 #include <predict/UKF_predict.h>
 #include <geometry_msgs/Vector3.h>
@@ -11,9 +10,8 @@
 
 double const dt = 1/24.5; // Frequency from the SITL
 
-double x[6];
-double z[3]; // x, y, r based on camera's estimations
-double a[3]; // psi, phi and chi angles from camera prediction
+double x[6] = {0};
+double z[3]; // u, v, r objects location in pixel frame 
 double P[36];
 const double RE[36];
 const double QE[9] = [2*1e-5, 0, 0, 0, 1e-5, 0, 0, 0, 1e-5];
@@ -38,18 +36,16 @@ void cam_cb (geometry_msgs::Twist &camera)
 {
 	z[1] = camera.linear.x;
 	z[2] = camera.linear.y;
-	z[3] = camera.linear.z;
-
-	a[1] = camera.anglular.x;
-	a[2] = camera.anglular.y;
-	a[3] = camera.anglular.z;
+	z[0] = camera.linear.z;
 
 	// Initialize x with the with the first values from camera
 	if (!xinitialized) {
-		for (int i = 0; i < 3; i++) {
-			x[i] = z[i];
-			x[i + 3] = a[i];
-		}
+		double dist = f*R_actual / z[0];
+		double camz = dist * f / ((z[1] - cx)^2 + (z[2] - cy)^2 + f*f)^0.5;
+		x[0] = (z[1] - cx) * camz / f;
+		x[1] = (z[2] - cy) * camz / f;
+		x[2] = camz;
+
 		xinitialized = true;
 	}
 
@@ -93,7 +89,7 @@ int main (int argc, char** argv)
 	current_pose = nh.advertise<geometry_msgs::Vector3>("/current_position", 10);
 	current_velo = nh.advertise<geometry_msgs::Vector3>("/current_velocity", 10);
 
-	cam_sub = nh.Subscribe ("/camera_pose", 10, cam_cb);
+	cam_sub = nh.Subscribe ("/camera_pose", 100, cam_cb);
 
 	ros::Rate loop_rate (100);
 
