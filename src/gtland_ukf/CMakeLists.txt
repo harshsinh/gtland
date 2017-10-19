@@ -1,8 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(ros_gtland)
-
-add_subdirectory (src/cam_to_global)
-add_subdirectory (src/gtland_ukf)
+project(gtland_ukf)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -10,14 +7,7 @@ add_subdirectory (src/gtland_ukf)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS
-  cv_bridge
-  geometry_msgs
-  nav_msgs
-  roscpp
-  rospy
-  std_msgs
-)
+find_package(catkin REQUIRED COMPONENTS roscpp geometry_msgs)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -54,9 +44,9 @@ find_package(catkin REQUIRED COMPONENTS
 
 ## Generate messages in the 'msg' folder
 # add_message_files(
-# 	DIRECTORY gtland_msgs/msg
-# 	FILES
-# 	ypr.msg
+#   FILES
+#   Message1.msg
+#   Message2.msg
 # )
 
 ## Generate services in the 'srv' folder
@@ -75,10 +65,8 @@ find_package(catkin REQUIRED COMPONENTS
 
 ## Generate added messages and services with any dependencies listed here
 # generate_messages(
-# 	DEPENDENCIES
-# 	geometry_msgs
-# 	nav_msgs
-# 	std_msgs
+#   DEPENDENCIES
+#   std_msgs  # Or other packages containing msgs
 # )
 
 ################################################
@@ -111,8 +99,9 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-   LIBRARIES ${PROJECT_NAME}
+#INCLUDE_DIRS include
+  LIBRARIES ${PROJECT_NAME}
+#  CATKIN_DEPENDS other_catkin_pkg
 #  DEPENDS system_lib
 )
 
@@ -122,12 +111,35 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(
-# include
-  ${catkin_INCLUDE_DIRS}
+include_directories(${catkin_INCLUDE_DIRS})
+
+add_executable(gtland_ukf src/ukf.cxx
+			  src/matlab/UKF_main_c.cpp
+			  src/matlab/xgehrd.cpp
+			  src/matlab/rtGetInf.cpp
+			  src/matlab/UKF_main_c_emxutil.cpp
+			  src/matlab/xgerc.cpp
+			  src/matlab/rtGetNaN.cpp
+			  src/matlab/UKF_main_c_initialize.cpp
+			  src/matlab/xhseqr.cpp
+			  src/matlab/rt_nonfinite.cpp
+			  src/matlab/UKF_main_c_rtwutil.cpp
+			  src/matlab/xnrm2.cpp
+			  src/matlab/UKF_main_c_terminate.cpp
+			  src/matlab/xrot.cpp
+			  src/matlab/schur.cpp
+			  src/matlab/xungorghr.cpp
+			  src/matlab/sqrt.cpp
+			  src/matlab/xdhseqr.cpp
+			  src/matlab/xzlarfg.cpp
+			  src/matlab/sqrtm.cpp
+			  src/matlab/xdlanv2.cpp
 )
+target_link_libraries(gtland_ukf ${catkin_LIBRARIES})
 
 ## Declare a C++ library
+add_library(ukf_lib
+	src/matlab/UKF_main_c.cpp)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -137,6 +149,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
+# add_executable(${PROJECT_NAME}_node src/setpoint_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -149,7 +162,9 @@ include_directories(
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-
+# target_link_libraries(${PROJECT_NAME}_node
+#   ${catkin_LIBRARIES}
+# )
 
 #############
 ## Install ##
@@ -191,7 +206,7 @@ include_directories(
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_ros_gtland.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_setpoint.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
