@@ -12,13 +12,12 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
-#include "rt_nonfinite.h"
-#include "rtwtypes.h"
+#include "../common/rt_nonfinite.h"
+#include "../common/rtwtypes.h"
 #include "UKF_predict_types.h"
 
 // Function Declarations
-extern void UKF_predict(const double x[6], double P[36], double dt, const double
-  RE[36]);
+void UKF_predict(double x[6], double P[36], double dt, const double RE[36]);
 
 #endif
 

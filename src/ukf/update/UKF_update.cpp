@@ -6,10 +6,10 @@
 //
 
 // Include Files
-#include "rt_nonfinite.h"
+#include "../common/rt_nonfinite.h"
 #include "UKF_update.h"
-#include "UKF_update_emxutil.h"
-#include "sqrtm.h"
+#include "../common/emxutil.h"
+#include "../common/sqrtm.h"
 
 // Function Definitions
 

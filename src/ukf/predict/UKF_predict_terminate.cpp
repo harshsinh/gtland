@@ -6,7 +6,7 @@
 //
 
 // Include Files
-#include "rt_nonfinite.h"
+#include "../common/rt_nonfinite.h"
 #include "UKF_predict.h"
 #include "UKF_predict_terminate.h"
 

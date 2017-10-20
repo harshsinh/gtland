@@ -6,12 +6,12 @@
 //
 
 // Include Files
-#include "rt_nonfinite.h"
+#include "../common/rt_nonfinite.h"
 #include "UKF_predict.h"
-#include "sqrt.h"
-#include "UKF_predict_emxutil.h"
-#include "schur.h"
-#include "UKF_predict_rtwutil.h"
+#include "../common/sqrt.h"
+#include "../common/emxutil.h"
+#include "../common/schur.h"
+#include "../common/rtwutil.h"
 
 // Function Definitions
 

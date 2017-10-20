@@ -52,7 +52,7 @@ void cam_cb (const geometry_msgs::Vector3 &camera)
 	}
 
 	// Call the UKF functions in the callback itself
-	UKF_predict (x, P, dt, RE);
+   	UKF_predict (x, P, dt, RE);
 	UKF_update (x, P, z, QE, R_actual, f, cx, cy);
 
 	// Publish the current position and Velocity messages

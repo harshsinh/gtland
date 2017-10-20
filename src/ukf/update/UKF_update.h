@@ -12,12 +12,12 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
-#include "rt_nonfinite.h"
-#include "rtwtypes.h"
+#include "../common/rt_nonfinite.h"
+#include "../common/rtwtypes.h"
 #include "UKF_update_types.h"
 
 // Function Declarations
-extern void UKF_update(double x[6], double P[36], const double z[3], const
+void UKF_update(double x[6], double P[36], const double z[3], const
   double QE[9], double R_actual, double f, double cx, double cy);
 
 #endif

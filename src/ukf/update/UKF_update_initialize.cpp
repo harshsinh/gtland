@@ -6,7 +6,7 @@
 //
 
 // Include Files
-#include "rt_nonfinite.h"
+#include "../common/rt_nonfinite.h"
 #include "UKF_update.h"
 #include "UKF_update_initialize.h"
 

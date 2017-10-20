@@ -8,7 +8,7 @@
 #define UKF_UPDATE_TYPES_H
 
 // Include Files
-#include "rtwtypes.h"
+#include "../common/rtwtypes.h"
 
 // Type Definitions
 #ifndef struct_emxArray__common

@@ -14,7 +14,6 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
-  message_generation
 )
 
 ## System dependencies are found with CMake's conventions
@@ -110,15 +109,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES ros_gtland
-	CATKIN_DEPENDS
-	cvbridge
-	geometry_msgs
-	nav_msgs
-	roscpp
-	rospy
-	std_msgs
-	message_runtime
+	LIBRARIES ${PROJECT_NAME}
 #  DEPENDS system_lib
 )
 
@@ -133,13 +124,27 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
+set (SOURCES src/ukf/ukf.cxx)
+
+file (GLOB MATLAB_PREDICT
+      src/ukf/predict/*.cpp)
+      
+file (GLOB MATLAB_UPDATE
+      src/ukf/update/*.cpp)
+      
+file (GLOB MATLAB_COMMON
+      src/ukf/common/*.cpp)
+    
 ## Declare a C++ library
-add_library(ukf_predict
-  src/ukf/predict/UKF_predict.cpp
-)
-add_library(ukf_update
-  src/ukf/update/UKF_update.cpp
-)
+add_library (ukf_lib ${MATLAB_COMMON}
+                     ${MATLAB_UPDATE}
+                     ${MATLAB_PREDICT})
+
+add_executable (gtland_ukf ${SOURCES})
+
+target_link_libraries (gtland_ukf
+                            ukf_lib
+                            ${catkin_LIBRARIES})
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
@@ -148,7 +153,6 @@ add_library(ukf_update
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(gtland_ukf src/ukf/ukf.cxx)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -161,11 +165,6 @@ add_executable(gtland_ukf src/ukf/ukf.cxx)
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(gtland_ukf
-  ${catkin_LIBRARIES}
-	ukf_predict
-	ukf_update
-)
 
 #############
 ## Install ##
