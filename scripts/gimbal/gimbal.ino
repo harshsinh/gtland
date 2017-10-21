@@ -159,7 +159,6 @@ SerialReadIMU() {
 	}
 
 	roll_IMU = str.toFloat();
-	int yaw_IMU = 0;
 	//for inverted
 	//  if (roll_IMU>0) roll_IMU=roll_IMU-180;
 	//  else if (roll_IMU<0) roll_IMU=roll_IMU+180;
