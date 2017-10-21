@@ -1,6 +1,8 @@
 #ifndef __GIMBAL_H__
 #define __GIMBAL_H__
 
+#include <cmath>
+
 /*** Constants for the Gimbal ***/
 # define yaw_max_len 7
 # define yaw_min_len 5
@@ -28,9 +30,6 @@
 class Gimbal {
 
 	public:
-		Gimbal();
-
-	public:
 		float yaw_imu = 0;
 		float pitch_imu = 0;
 		float roll_imu = 0;
@@ -50,7 +49,7 @@ class Gimbal {
 	public:
 		void pitch_pid (float);
 		void roll_pid (float);
-		void control_gimbal();
+		void control_gimbal (float);
 
-}
+};
 #endif

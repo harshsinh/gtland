@@ -24,7 +24,7 @@ void Gimbal::pitch_pid (float dt)
 	u_pitch_i_prev = u_pitch_i;
 	error_pitch_prev = error_pitch;
 
-	if (abs(u_pitch)>4)
+	if (std::abs(u_pitch)>4)
 		pitch_pwm = pitch_pwm + ALPHA*u_pitch*dt;
 }
 
@@ -53,14 +53,13 @@ void Gimbal::roll_pid (float dt)
 	u_roll_i_prev = u_roll_i;
 	error_roll_prev = error_roll;
 
-	if (abs(u_roll)>4)
+	if (std::abs(u_roll)>4)
 		roll_pwm = roll_pwm + ALPHA*u_roll*dt;
 
 }
 
-void Gimbal::control_gimbal()
+void Gimbal::control_gimbal (float current_time)
 {
-	float current_time=millis()/1000.0;
 	float dt = current_time - prev_time;
 	prev_time = current_time;
 	pitch_pid(dt);
