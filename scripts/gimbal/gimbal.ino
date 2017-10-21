@@ -2,6 +2,18 @@
 ************** Arduino Code for Gimbal Control ************
 **********************************************************/
 
+/**********************************************************
+Software Serial Rx, Tx -- 2, 3
+Servo Pins Pitch, Roll -- 5, 10
+ypr.x, ypr.y, ypr.z -- roll, pitch, yaw
+
+ROS subscriber to : /yprdesired topic : The desired angle
+setpoints for the gimbal.
+
+ROS publisher on : /yprgimbal topic : The current angles as
+percieved by the gimbal
+**********************************************************/
+
 #include <ros.h>
 #include <Servo.h>
 #include <Arduino.h>
@@ -9,6 +21,9 @@
 #include <SoftwareSerial.h>
 
 SoftwareSerial razor(2, 3); //Rx Tx
+
+#define Pitch_Servo_pin 5
+#define Roll_Servo_pin 10
 
 /*** Constants for the Gimbal ***/
 # define yaw_max_len 7
@@ -33,9 +48,6 @@ SoftwareSerial razor(2, 3); //Rx Tx
 #define Kp_roll 0.9
 #define Ki_roll 0.01
 #define Kd_roll 0.01
-
-#define Pitch_Servo_pin 8
-#define Roll_Servo_pin 9
 
 float yaw_IMU = 0;
 float pitch_IMU = 0;
