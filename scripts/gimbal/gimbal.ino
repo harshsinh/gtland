@@ -4,8 +4,8 @@
 
 #include <ros.h>
 #include <Servo.h>
-#include <ypr.h>
 #include <std_msgs/UInt32.h>
+#include <geometry_msgs/Vector3.h>
 
 /*** Constants for the Gimbal ***/
 # define yaw_max_len 7
@@ -54,9 +54,8 @@ Servo Pitch_Servo;
 Servo Roll_Servo;
 
 /*** ROS things ***/
-ros::NodeHandle nh;
-ros::Subscriber<ypr> sub("/yprdesired", &cb);
-ros::Publisher yprpub = nh.advertise<ypr>("/ypr", 100);
+ros::Subscriber<geometric_msgs::Vector3> sub("/yprdesired", &cb);
+ros::Publisher yprpub = nh.advertise<geometric_msgs::Vector3>("/ypr", 100);
 
 void cb(const std_msgs::UInt32& ypr) {
 
@@ -65,129 +64,120 @@ void cb(const std_msgs::UInt32& ypr) {
 	pitch_des = ypr.pitch;
 }
 
+void pitch_PID(float dt) {
 
-void pitch_PID(float dt){
-
-  float error_pitch = pitch_des - pitch_IMU;
-  float U_pitch_p = Kp_pitch * error_pitch;
-  float U_pitch_i = U_pitch_i_prev + 0.5 * Ki_pitch * ( error_pitch + error_pitch_prev ) * dt;
-  float U_pitch_d = Kd_pitch * ( error_pitch - error_pitch_prev ) / dt;
-
-  if (U_pitch_i > U_max) U_pitch_i = U_max;
-  else if (U_pitch_i < U_min) U_pitch_i = U_min;
-
-  float U_pitch = U_pitch_p + U_pitch_i + U_pitch_d;
-
-  if (U_pitch > U_max) U_pitch = U_max;
-  else if (U_pitch < U_min) U_pitch = U_min;
-
-  //Serial.println(U_pitch);
-  U_pitch_i_prev = U_pitch_i;
-  error_pitch_prev = error_pitch;
-
-  if (abs(U_pitch)>4) pitch_PWM = pitch_PWM + alpha*U_pitch*dt;
+	float error_pitch = pitch_des - pitch_IMU;
+	float U_pitch_p = Kp_pitch * error_pitch;
+	float U_pitch_i = U_pitch_i_prev + 0.5 * Ki_pitch * ( error_pitch + error_pitch_prev ) * dt;
+	float U_pitch_d = Kd_pitch * ( error_pitch - error_pitch_prev ) / dt;
+	if (U_pitch_i > U_max) U_pitch_i = U_max;
+	else if (U_pitch_i < U_min) U_pitch_i = U_min;
+	float U_pitch = U_pitch_p + U_pitch_i + U_pitch_d;
+	if (U_pitch > U_max) U_pitch = U_max;
+	else if (U_pitch < U_min) U_pitch = U_min;
+	//Serial.println(U_pitch);
+	U_pitch_i_prev = U_pitch_i;
+	error_pitch_prev = error_pitch;
+	if (abs(U_pitch)>4) pitch_PWM = pitch_PWM + alpha*U_pitch*dt;
 }
 
-void roll_PID(float dt){
+void roll_PID(float dt) {
 
-  float error_roll = roll_des - roll_IMU;
-  float U_roll_p = Kp_roll * error_roll;
-  float U_roll_i = U_roll_i_prev + 0.5 * Ki_roll * ( error_roll + error_roll_prev ) * dt;
-  float U_roll_d = Kd_roll * ( error_roll - error_roll_prev ) / dt;
-
-  if (U_roll_i > U_max) U_roll_i = U_max;
-  else if (U_roll_i < U_min) U_roll_i = U_min;
-
-  float U_roll = U_roll_p + U_roll_i + U_roll_d;
-
-  if (U_roll > U_max) U_roll = U_max;
-  else if (U_roll < U_min) U_roll = U_min;
-
-  U_roll_i_prev = U_roll_i;
-  error_roll_prev = error_roll;
-
-  if (abs(U_roll)>4) roll_PWM = roll_PWM + alpha*U_roll*dt;
+	float error_roll = roll_des - roll_IMU;
+	float U_roll_p = Kp_roll * error_roll;
+	float U_roll_i = U_roll_i_prev + 0.5 * Ki_roll * ( error_roll + error_roll_prev ) * dt;
+	float U_roll_d = Kd_roll * ( error_roll - error_roll_prev ) / dt;
+	if (U_roll_i > U_max) U_roll_i = U_max;
+	else if (U_roll_i < U_min) U_roll_i = U_min;
+	float U_roll = U_roll_p + U_roll_i + U_roll_d;
+	if (U_roll > U_max) U_roll = U_max;
+	else if (U_roll < U_min) U_roll = U_min;
+	U_roll_i_prev = U_roll_i;
+	error_roll_prev = error_roll;
+	if (abs(U_roll)>4) roll_PWM = roll_PWM + alpha*U_roll*dt;
 }
 
-void controlGimbal(){
-  float current_time=millis()/1000.0;
-  float dt = current_time - prev_time;
-  prev_time = current_time;
+void controlGimbal() {
 
-  pitch_PID(dt);
-  roll_PID(dt);
+	float current_time=millis()/1000.0;
+	float dt = current_time - prev_time;
+	prev_time = current_time;
+	pitch_PID(dt);
+	roll_PID(dt);
+	if (pitch_PWM > max_pitch_PWM) pitch_PWM = max_pitch_PWM;
+	if (pitch_PWM < min_pitch_PWM) pitch_PWM = min_pitch_PWM;
+	if (roll_PWM > max_roll_PWM) roll_PWM = max_roll_PWM;
+	if (roll_PWM < min_roll_PWM) roll_PWM = min_roll_PWM;
+	Pitch_Servo.writeMicroseconds(pitch_PWM);
+	Roll_Servo.writeMicroseconds(roll_PWM);
 
-  if (pitch_PWM > max_pitch_PWM) pitch_PWM = max_pitch_PWM;
-  if (pitch_PWM < min_pitch_PWM) pitch_PWM = min_pitch_PWM;
-  if (roll_PWM > max_roll_PWM) roll_PWM = max_roll_PWM;
-  if (roll_PWM < min_roll_PWM) roll_PWM = min_roll_PWM;
-  Pitch_Servo.writeMicroseconds(pitch_PWM);
-  Roll_Servo.writeMicroseconds(roll_PWM);
 }
 
-void SerialReadIMU(){
-  char inchar = Serial.read();
+SerialReadIMU() {
 
-  while (inchar != '=')
-  {
-    inchar = Serial.read();
-  }
+	char inchar = Serial.read();
 
-  String str = "";
-  inchar = Serial.read();
+	while (inchar != '=') {
+		inchar = Serial.read();
+	}
 
-  while (inchar != ',') {
-    if (inchar != -1 && inchar != '#')
-      str = str + inchar;
-    inchar = Serial.read();
-  }
+	String str = "";
+	inchar = Serial.read();
 
-  //if (str.length() <= yaw_max_len && str.length() >= yaw_min_len) {
-    yaw_IMU = str.toFloat();
-  //}
+	while (inchar != ',') {
+		if (inchar != -1 && inchar != '#')
+		str = str + inchar;
+		inchar = Serial.read();
+	}
 
-  str = "";
+	//if (str.length() <= yaw_max_len && str.length() >= yaw_min_len) {
+	yaw_IMU = str.toFloat();
+	//}
+	str = "";
+	inchar = Serial.read();
 
-  inchar = Serial.read();
-  while (inchar != ',')
-  {
-    if (inchar != -1 && inchar != '#') str = str + inchar;
-    inchar = Serial.read();
-  }
-  pitch_IMU = str.toFloat();
-  str = "";
+	while (inchar != ',') {
+		if (inchar != -1 && inchar != '#') str = str + inchar;
+		inchar = Serial.read();
+	}
 
-  inchar = Serial.read();
-  while (inchar != ',')
-  {
-    if (inchar != -1 && inchar != '#') str = str + inchar;
-    inchar = Serial.read();
-  }
-  roll_IMU = str.toFloat();
-  //for inverted
-//  if (roll_IMU>0) roll_IMU=roll_IMU-180;
-//  else if (roll_IMU<0) roll_IMU=roll_IMU+180;
-//  pitch_IMU=-pitch_IMU;
+	pitch_IMU = str.toFloat();
+	str = "";
 
-  Serial.print(pitch_IMU);Serial.print('\t');
-  Serial.print(roll_IMU);Serial.print('\n');
+	inchar = Serial.read();
+
+	while (inchar != ',') {
+		if (inchar != -1 && inchar != '#') str = str + inchar;
+		inchar = Serial.read();
+	}
+
+	roll_IMU = str.toFloat();
+	//for inverted
+	//  if (roll_IMU>0) roll_IMU=roll_IMU-180;
+	//  else if (roll_IMU<0) roll_IMU=roll_IMU+180;
+	//  pitch_IMU=-pitch_IMU;
+
+	Serial.print(pitch_IMU);Serial.print('\t');
+	Serial.print(roll_IMU);Serial.print('\n');
 }
 
 void setup() {
-  Pitch_Servo.attach(Pitch_Servo_pin);
-  Roll_Servo.attach(Roll_Servo_pin);
-  Serial.begin(57600);
-  Pitch_Servo.writeMicroseconds(pitch_PWM);
-  Roll_Servo.writeMicroseconds(roll_PWM);
+
+	ros::NodeHandle nh;
+	Pitch_Servo.attach(Pitch_Servo_pin);
+	Roll_Servo.attach(Roll_Servo_pin);
+	Serial.begin(57600);
+	Pitch_Servo.writeMicroseconds(pitch_PWM);
+	Roll_Servo.writeMicroseconds(roll_PWM);
 }
 
 void loop() {
 
-  if (Serial.available()) {
-    SerialReadIMU();
-    controlGimbal();
-  }
-  else Serial.println("#o1");
-  nh.spinOnce();
-  delay(1);
+	if (Serial.available()) {
+		SerialReadIMU();
+		controlGimbal();
+	}
+	else Serial.println("#o1");
+	nh.spinOnce();
+	delay(1);
 }
