@@ -1,3 +1,5 @@
+#include <math.h>
+
 #include "gimbal.h"
 
 void Gimbal::pitch_pid (float dt)
@@ -7,6 +9,7 @@ void Gimbal::pitch_pid (float dt)
 	float u_pitch_p = Kp_pitch * error_pitch;
 	float u_pitch_i = u_pitch_i_prev + 0.5 * Ki_pitch * ( error_pitch + error_pitch_prev ) * dt;
 	float u_pitch_d = Kd_pitch * ( error_pitch - error_pitch_prev ) / dt;
+
 	if (u_pitch_i > U_MAX)
 		u_pitch_i = U_MAX;
 
@@ -24,7 +27,7 @@ void Gimbal::pitch_pid (float dt)
 	u_pitch_i_prev = u_pitch_i;
 	error_pitch_prev = error_pitch;
 
-	if (std::abs(u_pitch)>4)
+	if (fabs(u_pitch)>4)
 		pitch_pwm = pitch_pwm + ALPHA*u_pitch*dt;
 }
 
@@ -53,7 +56,7 @@ void Gimbal::roll_pid (float dt)
 	u_roll_i_prev = u_roll_i;
 	error_roll_prev = error_roll;
 
-	if (std::abs(u_roll)>4)
+	if (fabs(u_roll)>4)
 		roll_pwm = roll_pwm + ALPHA*u_roll*dt;
 
 }

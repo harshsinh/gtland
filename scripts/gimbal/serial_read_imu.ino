@@ -1,4 +1,9 @@
-void SerialReadIMU() {
+#include <ros.h>
+#include <geometry_msgs/Vector3.h>
+geometry_msgs::Vector3 serial_read_imu()
+{
+
+	geometry_msgs::Vector3 gimbal_ang_msg;
 
 	char inchar = Serial.read();
 
@@ -16,7 +21,7 @@ void SerialReadIMU() {
 	}
 
 	//if (str.length() <= yaw_max_len && str.length() >= yaw_min_len) {
-	yaw_IMU = str.toFloat();
+        g.yaw_imu = str.toFloat();
 	//}
 	str = "";
 	inchar = Serial.read();
@@ -26,7 +31,7 @@ void SerialReadIMU() {
 		inchar = Serial.read();
 	}
 
-	pitch_IMU = str.toFloat();
+	g.pitch_imu = str.toFloat();
 	str = "";
 
 	inchar = Serial.read();
@@ -36,16 +41,15 @@ void SerialReadIMU() {
 		inchar = Serial.read();
 	}
 
-	roll_IMU = str.toFloat();
+	g.roll_imu = str.toFloat();
 	//for inverted
 	//  if (roll_IMU>0) roll_IMU=roll_IMU-180;
 	//  else if (roll_IMU<0) roll_IMU=roll_IMU+180;
 	//  pitch_IMU=-pitch_IMU;
 
-	gimbal_ang_msg.x = roll_IMU;
-	gimbal_ang_msg.y = pitch_IMU;
-	gimbal_ang_msg.z = yaw_IMU;
+	gimbal_ang_msg.x = g.roll_imu;
+	gimbal_ang_msg.y = g.pitch_imu;
+	gimbal_ang_msg.z = g.yaw_imu;
 
-	Serial.print(pitch_IMU);Serial.print('\t');
-	Serial.print(roll_IMU);Serial.print('\n');
+	return gimbal_ang_msg;
 }

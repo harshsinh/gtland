@@ -1,7 +1,4 @@
-#ifndef __GIMBAL_H__
-#define __GIMBAL_H__
-
-#include <cmath>
+#include <math.h>
 
 /*** Constants for the Gimbal ***/
 # define yaw_max_len 7
@@ -38,7 +35,7 @@ class Gimbal {
 		float pitch_pwm = 1100;
 
 		float roll_des = 0;
-		float pitch_des = -0;
+		float pitch_des = 0;
 
 		float error_pitch_prev = 0;
 		float error_roll_prev = 0;
@@ -52,4 +49,3 @@ class Gimbal {
 		void control_gimbal (float);
 
 };
-#endif
