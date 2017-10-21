@@ -6,6 +6,9 @@
 #include <Servo.h>
 #include <Arduino.h>
 #include <geometry_msgs/Vector3.h>
+#include <SoftwareSerial.h>
+
+SoftwareSerial razor(2, 3); //Rx Tx
 
 /*** Constants for the Gimbal ***/
 # define yaw_max_len 7
@@ -162,7 +165,8 @@ void SerialReadIMU() {
 
       	char carray[str.length() + 1];
         str.toCharArray(carray, sizeof(carray));
-	roll_IMU = atof(carray);
+	roll_IMU = atof(carray
+);
 	//for inverted
 	//  if (roll_IMU>0) roll_IMU=roll_IMU-180;
 	//  else if (roll_IMU<0) roll_IMU=roll_IMU+180;
@@ -181,7 +185,7 @@ void setup() {
 
 	Pitch_Servo.attach(Pitch_Servo_pin);
 	Roll_Servo.attach(Roll_Servo_pin);
-	Serial.begin(57600);
+	razor.begin(57600);
 	Pitch_Servo.writeMicroseconds(pitch_PWM);
 	Roll_Servo.writeMicroseconds(roll_PWM);
 	nh.initNode();
@@ -191,12 +195,12 @@ void setup() {
 
 void loop() {
 
-	if (Serial.available()) {
+	if (razor.available()) {
 		SerialReadIMU();
 		controlGimbal();
 		yprpub.publish (&gimbal_ang_msg);
 	}
 
-	else Serial.println("#o1");
+	else razor.println("#o1");
 	delay (1);
 }
