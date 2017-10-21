@@ -123,19 +123,19 @@ void controlGimbal() {
 
 void SerialReadIMU() {
 
-	char inchar = Serial.read();
+	char inchar = razor.read();
 
 	while (inchar != '=') {
-		inchar = Serial.read();
+		inchar = razor.read();
 	}
 
 	String str = "";
-	inchar = Serial.read();
+	inchar = razor.read();
 
 	while (inchar != ',') {
 		if (inchar != -1 && inchar != '#')
 		str = str + inchar;
-		inchar = Serial.read();
+		inchar = razor.read();
 	}
 
 	//if (str.length() <= yaw_max_len && str.length() >= yaw_min_len) {
@@ -144,11 +144,11 @@ void SerialReadIMU() {
         yaw_IMU = atof(aarray);
 	//}
 	str = "";
-	inchar = Serial.read();
+	inchar = razor.read();
 
 	while (inchar != ',') {
 		if (inchar != -1 && inchar != '#') str = str + inchar;
-		inchar = Serial.read();
+		inchar = razor.read();
 	}
 
 	char barray[str.length() + 1];
@@ -156,11 +156,11 @@ void SerialReadIMU() {
 	pitch_IMU = atof(barray);
 	str = "";
 
-	inchar = Serial.read();
+	inchar = razor.read();
 
 	while (inchar != ',') {
 		if (inchar != -1 && inchar != '#') str = str + inchar;
-		inchar = Serial.read();
+		inchar = razor.read();
 	}
 
       	char carray[str.length() + 1];
@@ -176,8 +176,8 @@ void SerialReadIMU() {
 	gimbal_ang_msg.y = pitch_IMU;
 	gimbal_ang_msg.z = yaw_IMU;
 
-	Serial.print(pitch_IMU);Serial.print('\t');
-	Serial.print(roll_IMU);Serial.print('\n');
+	razor.print(pitch_IMU);razor.print('\t');
+	razor.print(roll_IMU);razor.print('\n');
 }
 
 void setup() {
@@ -203,4 +203,5 @@ void loop() {
 
 	else razor.println("#o1");
 	delay (1);
+        nh.spinOnce();
 }
