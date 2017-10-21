@@ -53,11 +53,18 @@ float prev_time = 0;
 Servo Pitch_Servo;
 Servo Roll_Servo;
 
-/*** ROS things ***/
-ros::Subscriber<geometric_msgs::Vector3> sub("/yprdesired", &cb);
-ros::Publisher yprpub = nh.advertise<geometric_msgs::Vector3>("/ypr", 100);
+geometry_msgs::Vector3 gimbal_ang_msg;
 
-void cb(const std_msgs::UInt32& ypr) {
+// Declaration for cb needs to be before that of subscriber
+void cb (const std_msgs::UInt32&);
+
+/*** ROS things ***/
+ros::NodeHandle nh;
+ros::Subscriber<geometric_msgs::Vector3> sub("/yprdesired", &cb);
+ros::Publisher yprpub = nh.advertise<geometric_msgs::Vector3>("/ypr_gimbal", 100);
+
+
+void cb (const std_msgs::UInt32& ypr) {
 
 	float yawdesired = ypr.yaw;
 	roll_des = ypr.roll;
@@ -152,10 +159,15 @@ SerialReadIMU() {
 	}
 
 	roll_IMU = str.toFloat();
+	int yaw_IMU = 0;
 	//for inverted
 	//  if (roll_IMU>0) roll_IMU=roll_IMU-180;
 	//  else if (roll_IMU<0) roll_IMU=roll_IMU+180;
 	//  pitch_IMU=-pitch_IMU;
+
+	gimbal_ang_msg.x = roll_IMU;
+	gimbal_ang_msg.y = pitch_IMU;
+	gimbal_ang_msg.z = yaw_IMU;
 
 	Serial.print(pitch_IMU);Serial.print('\t');
 	Serial.print(roll_IMU);Serial.print('\n');
@@ -163,12 +175,14 @@ SerialReadIMU() {
 
 void setup() {
 
-	ros::NodeHandle nh;
+
 	Pitch_Servo.attach(Pitch_Servo_pin);
 	Roll_Servo.attach(Roll_Servo_pin);
 	Serial.begin(57600);
 	Pitch_Servo.writeMicroseconds(pitch_PWM);
 	Roll_Servo.writeMicroseconds(roll_PWM);
+	nh.initNode();
+	nh.subscribe (sub);
 }
 
 void loop() {
@@ -176,8 +190,9 @@ void loop() {
 	if (Serial.available()) {
 		SerialReadIMU();
 		controlGimbal();
+		yprpub.publish (gimbal_ang_msg);
 	}
+
 	else Serial.println("#o1");
-	nh.spinOnce();
-	delay(1);
+	delay (1);
 }
