@@ -16,14 +16,13 @@ percieved by the gimbal
 
 #include <ros.h>
 #include <Servo.h>
-#include <Arduino.h>
 #include <geometry_msgs/Vector3.h>
-#include <SoftwareSerial.h>
-
-SoftwareSerial razor(2, 3); //Rx Tx
+#include <AltSoftSerial.h>
 
 #define Pitch_Servo_pin 5
-#define Roll_Servo_pin 10
+#define Roll_Servo_pin 12
+#define rxpin 2
+#define txpin 3
 
 /*** Constants for the Gimbal ***/
 # define yaw_max_len 7
@@ -69,7 +68,9 @@ float prev_time = 0;
 Servo Pitch_Servo;
 Servo Roll_Servo;
 
+
 geometry_msgs::Vector3 gimbal_ang_msg;
+AltSoftSerial razor;
 
 void cb (const geometry_msgs::Vector3& ypr) {
 
@@ -195,12 +196,18 @@ void SerialReadIMU() {
 void setup() {
 
 
-	Pitch_Servo.attach(Pitch_Servo_pin);
+        pinMode(rxpin, INPUT);
+        pinMode(txpin, OUTPUT);
+        
+        razor.begin(57600);
+        Serial.begin(57600);
+	
+        Pitch_Servo.attach(Pitch_Servo_pin);
 	Roll_Servo.attach(Roll_Servo_pin);
-	razor.begin(57600);
 	Pitch_Servo.writeMicroseconds(pitch_PWM);
 	Roll_Servo.writeMicroseconds(roll_PWM);
-	nh.initNode();
+	
+        nh.initNode();
         nh.advertise(yprpub);
 	nh.subscribe (sub);
 }
@@ -211,9 +218,17 @@ void loop() {
 		SerialReadIMU();
 		controlGimbal();
 		yprpub.publish (&gimbal_ang_msg);
+                Serial.println("lol");
 	}
 
-	else razor.println("#o1");
+	else {
+              razor.print('#');
+              razor.print('o');
+              razor.print('1');
+              razor.print('\n');
+              char lul = razor.read();
+              Serial.print(lul);
+        }
 	delay (1);
         nh.spinOnce();
 }
