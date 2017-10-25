@@ -28,7 +28,6 @@ find_package(catkin REQUIRED COMPONENTS
 ################################################
 ## Declare ROS messages, services and actions ##
 ################################################
-
 ## To declare and build messages, services or actions from within this
 ## package, follow these steps:
 ## * Let MSG_DEP_SET be the set of packages whose message types you use in
@@ -121,6 +120,7 @@ catkin_package(
 ## Your package locations should be listed before other locations
 include_directories(
 	include/${PROJECT_NAME}
+)
 include_directories(
   ${catkin_INCLUDE_DIRS}
 )
@@ -202,4 +202,4 @@ include_directories(
 ####################
 
 add_subdirectory (src/gtland_ukf)
-add_subdirectory (src/cam_to_global)
+#add_subdirectory (src/cam_to_global)
