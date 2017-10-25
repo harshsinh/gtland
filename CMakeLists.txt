@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(ros_gtland)
 
-add_subdirectory (src/cam_to_global)
-add_subdirectory (src/gtland_ukf)
-
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
 
@@ -31,7 +28,6 @@ find_package(catkin REQUIRED COMPONENTS
 ################################################
 ## Declare ROS messages, services and actions ##
 ################################################
-
 ## To declare and build messages, services or actions from within this
 ## package, follow these steps:
 ## * Let MSG_DEP_SET be the set of packages whose message types you use in
@@ -123,7 +119,9 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
+	include/${PROJECT_NAME}
+)
+include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
@@ -198,3 +196,10 @@ include_directories(
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
+####################
+## Subdirectories ##
+####################
+
+add_subdirectory (src/gtland_ukf)
+add_subdirectory (src/cam_to_global)
