@@ -1,24 +1,32 @@
 #include <ros/ros.h>
 #include <iostream>
-#include <cv_bridge/cv_bridge.h>
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/calib3d/calib3d.hpp>
-#include <image_transport/image_transport.h>
-
+#include "CVInclude.h"
 #include <geometry_msgs/Vector3.h>
+
+cv::VideoCapture cap;
 
 int main (int argc, char** argv)
 {
 
-	VideoCapture cap(0);
+	int camera = argv [1][0] - 48;
+
+	if (camera < 0) {
+		ROS_ERROR_STREAM ("Not a valid camera address")
+	}
 
 	if (!cap.isOpened()) {
 		std::cout << "Unable to open camera 0" << std::endl;
+		ROS_ERROR_STREAM ("Unable to open camera 0");
 		return -1;
 	}
 
+	ros::init (argc, argv, "detector2");
+	ros::NodeHandle nh;
+	image_transport::ImageTransport it (nh);
+
+	image_transport::Publisher pub = it.advertise ("detected_image", 1);
+
+	ros::Subscriber sub = nh.subscribe ("", 1000, msgCallback);
 
 	return 0;
 }
