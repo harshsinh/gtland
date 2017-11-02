@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(ros_gtland)
 
-add_subdirectory (src/cam_to_global)
-add_subdirectory (src/gtland_ukf)
-
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
 
