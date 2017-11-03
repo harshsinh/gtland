@@ -203,4 +203,4 @@ include_directories(
 
 add_subdirectory (src/gtland_ukf)
 add_subdirectory (src/cam_to_global)
-add_subdirectory (src/land_trajectory_gen)
+add_subdirectory (src/trajectory_gen)
