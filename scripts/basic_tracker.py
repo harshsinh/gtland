@@ -114,7 +114,7 @@ while True:
             cv2.circle(frame, (int(x), int(y)), int(radius), (0, 255, 255), 2)
             pixel_cord.x = int(x)
             pixel_cord.y = int(y)
-            pixel_cord.z = int(dist)
+            pixel_cord.z = int(radius)
             pub.publish(pixel_cord)
             cv2.circle(frame, center, 5, (0, 0, 255), -1)
 
