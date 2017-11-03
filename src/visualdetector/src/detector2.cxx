@@ -19,7 +19,7 @@ int main (int argc, char** argv)
 	int camera = argv [1][0] - 48;
 
 	if (camera < 0)
-		ROS_ERROR_STREAM ("Not a valid camera address")
+		ROS_ERROR_STREAM ("Not a valid camera address");
 
 	cap.open (camera);
 
