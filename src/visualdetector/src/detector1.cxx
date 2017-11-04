@@ -22,7 +22,10 @@ int main (int argc, char ** argv)
     std::vector<std::vector<cv::Point> > contours;
     std::vector<cv::Vec4i> hierarchy;
     std::vector<double> area;
-	
+    
+    // scaling factors
+    double imScale = 0.25;
+
 	//camera choice
 	int camera = argv [1][0] - 48;
 
@@ -57,7 +60,7 @@ int main (int argc, char ** argv)
             cv::Scalar colorHigh (bh, gh, rh);
             //find marker
             cv::Mat resized, blurred, gray, hsv, thresh, ero, dila;
-            cv::resize (frame, resized, cv::Size(), 0.50, 0.50, CV_INTER_LINEAR);
+            cv::resize (frame, resized, cv::Size(), imScale, imScale, CV_INTER_LINEAR);
             cv::GaussianBlur (resized, blurred,  cv::Size(11, 11), 0, 0);
             cv::cvtColor (blurred, hsv, CV_BGR2HSV);
             cv::inRange (hsv, colorLow, colorHigh, thresh);
@@ -67,9 +70,8 @@ int main (int argc, char ** argv)
             // Find contours
             findContours( dila, contours, hierarchy, CV_RETR_TREE, 
                         CV_CHAIN_APPROX_SIMPLE, cv::Point(0, 0) );
-            std::cout << "contours size : " << contours.size() << std::endl;
+
             if (contours.size() > 0) {
-                std::cout << __PRETTY_FUNCTION__ << std::endl;
                 for (int i = 0; i < contours.size(); ++i) {
                     double ar;
                     ar = cv::contourArea (contours[i]);
@@ -85,14 +87,15 @@ int main (int argc, char ** argv)
                 float& refrad = radius;
                 cv::minEnclosingCircle ((cv::Mat)contours[idx], circenter, refrad);
                 center = cv::Point2f( M.m10/M.m00 , M.m01/M.m00 );
-    
+
+                std::cout << "radius : " << int(radius) << std::endl;
+
                 if (radius > 5.0) {
-                    double dist = 3500.0/(int(radius));
-                    cv::putText (frame, std::to_string(dist), circenter, cv::FONT_HERSHEY_SIMPLEX, 0.5, 0, 2);
-                    cv::circle (frame, circenter, int(radius), cv::Scalar(0, 255, 255), 2, 8, 0);
-                    pixelCord.x = int(circenter.x);
-                    pixelCord.y = int(circenter.y);
-                    pixelCord.z = int(dist);
+                    cv::putText (frame, std::to_string(radius), 2*circenter, cv::FONT_HERSHEY_SIMPLEX, imScale, 0, 2);
+                    cv::circle (frame, 2*circenter, int(radius/imScale), cv::Scalar(0, 255, 255), 2, 8, 0);
+                    pixelCord.x = int(circenter.x/imScale);
+                    pixelCord.y = int(circenter.y/imScale);
+                    pixelCord.z = int(radius/imScale);
                     pub.publish (pixelCord);
                 }
                 area.clear();
