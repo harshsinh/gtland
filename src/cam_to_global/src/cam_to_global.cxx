@@ -28,9 +28,9 @@ void current_vel_callback(const geometry_msgs::Vector3 & msg)
 
 void cam_imu(const geometry_msgs::Vector3 & msg)
 {
-        y=msg.x;
-        p=msg.y;
-        r=msg.z;
+        y=(3.14/180)*msg.x;
+        p=(3.14/180)*msg.y;
+        r=(3.14/180)*msg.z;
 }
 
 int main(int argc, char **argv)
@@ -62,7 +62,7 @@ int main(int argc, char **argv)
             current_velocity_global.z = current_vel_global[2];
 
             pos.publish(current_position_global);
-            pos.publish(current_velocity_global);
+            velo.publish(current_velocity_global);
 
             ros::spinOnce();
             count++;

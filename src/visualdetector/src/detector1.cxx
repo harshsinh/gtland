@@ -24,7 +24,7 @@ int main (int argc, char ** argv)
     std::vector<double> area;
     
     // scaling factors
-    double imScale = 0.25;
+    double imScale = 0.50;
 
 	//camera choice
 	int camera = argv [1][0] - 48;
