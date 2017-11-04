@@ -1,5 +1,7 @@
 #include <ros/ros.h>
 #include <iostream>
+#include <string>
+#include <vector>
 #include "CVInclude.h"
 #include <geometry_msgs/Vector3.h>
 
