@@ -36,3 +36,6 @@
 
 # Ignore the trackbar files
 [0-9][0-9][0-9]+
+
+# Ignore vscore
+.vscode
