@@ -3,3 +3,8 @@ target_link_libraries (detector_node
 						${catkin_LIBRARIES}
 						${openCV_LIBRARIES}
 	)
+add_executable (detector_node_old src/detector1.cxx)
+target_link_libraries (detector_node_old
+						${catkin_LIBRARIES}
+						${openCV_LIBRARIES}
+	)

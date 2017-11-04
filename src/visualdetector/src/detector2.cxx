@@ -1,13 +1,7 @@
 #include <ros/ros.h>
 #include <iostream>
-// #include "CVInclude.h"
+#include "CVInclude.h"
 #include <geometry_msgs/Vector3.h>
-#include <cv_bridge/cv_bridge.h>
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/calib3d/calib3d.hpp>
-#include <image_transport/image_transport.h>
 
 cv::VideoCapture cap;
 
@@ -34,8 +28,18 @@ int main (int argc, char** argv)
 
 	cv::namedWindow ("thresholded");
 	cv::startWindowThread();
-	int th;
+	int th, rl, bl, gl, rh, bh, gh;
 	cv::createTrackbar ("Threshold", "thresholded", &th, 255);
+
+	cv::createTrackbar ("Red Low", "color", &rl, 255);
+	cv::createTrackbar ("Blue Low", "color", &bl, 255);
+	cv::createTrackbar ("Green Low", "color", &gl, 255);
+	cv::createTrackbar ("Red High", "color", &rh, 255);
+	cv::createTrackbar ("Blue High", "color", &bh, 255);
+	cv::createTrackbar ("Green High", "color", &gh, 255);
+
+	cv::Scalar colorLow (bl, gl, rl);
+	cv::Scalar colorHigh (bh, gh, rh);
 
 	if (!cap.isOpened()) {
 		std::cout << "Unable to open camera "<< camera << std::endl;
