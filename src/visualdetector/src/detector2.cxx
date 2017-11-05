@@ -19,6 +19,8 @@ int main (int argc, char** argv)
 
 	// cv stuff
 	cv::Mat frame;
+	std::vector<std::vector<cv::Point> > contours;
+	std::vector<cv::Vec4i> hierarchy;
 	
 	//camera choice
 	int camera = argv [1][0] - 48;

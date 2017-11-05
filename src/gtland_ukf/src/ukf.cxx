@@ -22,7 +22,7 @@ double cy = 227.812694;
 double f  = (757.324001 +  760.531946)/2;
 
 // radius of the actual ball
-const double R_actual = 0.0212;
+const double R_actual = 0.03;
 
 bool xinitialized = false;
 

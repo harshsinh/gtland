@@ -4,6 +4,8 @@
 #include <vector>
 #include <string>
 #include <geometry_msgs/Vector3.h>
+#include <image_transport/image_transport.h>
+#include <cv_bridge/cv_bridge.h>
 
 cv::VideoCapture cap;
 
@@ -13,6 +15,9 @@ int main (int argc, char ** argv)
     //ros node stuff
 	ros::init (argc, argv, "detector1");
     ros::NodeHandle nh;
+	image_transport::ImageTransport it(nh);
+	image_transport::Publisher threshpub = it.advertise ("thresholded", 1);
+	image_transport::Publisher detectpub = it.advertise ("detected", 1);
     ros::Publisher pub = nh.advertise<geometry_msgs::Vector3>("/camera_pose", 100);
 	ros::Rate loop_rate (500);
     geometry_msgs::Vector3 pixelCord;
@@ -22,9 +27,9 @@ int main (int argc, char ** argv)
     std::vector<std::vector<cv::Point> > contours;
     std::vector<cv::Vec4i> hierarchy;
     std::vector<double> area;
-    
+
     // scaling factors
-    double imScale = 0.50;
+    double imScale = 1.00;
 
 	//camera choice
 	int camera = argv [1][0] - 48;
@@ -44,18 +49,18 @@ int main (int argc, char ** argv)
 	cv::createTrackbar ("Red High", "color", &rh, 255);
 	cv::createTrackbar ("Blue High", "color", &bh, 255);
 	cv::createTrackbar ("Green High", "color", &gh, 255);
-    
+
 	if (!cap.isOpened()) {
 		std::cout << "Unable to open camera "<< camera << std::endl;
 		ROS_ERROR_STREAM ("Unable to open camera");
 		return -1;
     }
-    
+
     while (nh.ok()) {
-        
+
         cap >> frame;
         if (!frame.empty()) {
-        
+
             cv::Scalar colorLow (bl, gl, rl);
             cv::Scalar colorHigh (bh, gh, rh);
             //find marker
@@ -80,7 +85,7 @@ int main (int argc, char ** argv)
 
                 std::vector<double>::iterator max_area = std::max_element (area.begin(), area.end());
                 int idx = std::distance (area.begin(), max_area);
-    
+
                 cv::Moments M = cv::moments (contours[idx]);
                 cv::Point2f center, circenter;
                 float radius;
@@ -90,9 +95,9 @@ int main (int argc, char ** argv)
 
                 std::cout << "radius : " << int(radius) << std::endl;
 
-                if (radius > 5.0) {
-                    cv::putText (frame, std::to_string(radius), 2*circenter, cv::FONT_HERSHEY_SIMPLEX, imScale, 0, 2);
-                    cv::circle (frame, 2*circenter, int(radius/imScale), cv::Scalar(0, 255, 255), 2, 8, 0);
+                if (radius > 2.0 && radius < 225) {
+                    cv::putText (frame, std::to_string(radius), circenter/imScale, cv::FONT_HERSHEY_SIMPLEX, imScale, 0, 2);
+                    cv::circle (frame, circenter/imScale, int(radius/imScale), cv::Scalar(0, 255, 255), 2, 8, 0);
                     pixelCord.x = int(circenter.x/imScale);
                     pixelCord.y = int(circenter.y/imScale);
                     pixelCord.z = int(radius/imScale);
@@ -103,22 +108,24 @@ int main (int argc, char ** argv)
 
             // show stuff
             cv::imshow ("original", frame);
-            cv::imshow ("blurred", blurred);
             cv::imshow ("hsv", hsv);
             cv::imshow ("color", thresh);
+			// publish images
+			threshpub.publish (cv_bridge::CvImage (std_msgs::Header(), "mono8", thresh).toImageMsg());
+			detectpub.publish (cv_bridge::CvImage (std_msgs::Header(), "bgr8", frame).toImageMsg());
             // stop if "q" is pressed
             if (cv::waitKey(1) == 113)
             break;
         }
-        
+
         else {
             ROS_ERROR_STREAM ("No Image found!");
             return -1;
         }
-        
+
         ros::spinOnce();
         loop_rate.sleep();
-        
+
     }
     return 0;
 }
