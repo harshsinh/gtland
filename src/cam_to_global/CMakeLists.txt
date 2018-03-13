@@ -8,3 +8,4 @@ add_executable (cam2global
 				src/matlab/rt_nonfinite.cpp
 )
 target_link_libraries (cam2global ${catkin_LIBRARIES})
+add_dependencies (cam2global ${PROJECT_NAME}_generated_messages_cpp ${catkin_EXPORTED_TARGETS})

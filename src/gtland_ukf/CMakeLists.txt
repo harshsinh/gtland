@@ -22,3 +22,4 @@ add_executable(gtland_ukf
 			  src/matlab/xdlanv2.cpp
 )
 target_link_libraries(gtland_ukf ${catkin_LIBRARIES})
+add_dependencies (gtland_ukf ${PROJECT_NAME}_generated_messages_cpp ${catkin_EXPORTED_TARGETS})
