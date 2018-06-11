@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+
+<launch>
+    <include file="$(find ros_gtland)/launch/sim_init.launch">
+        <arg name="world" value="$(find ros_gtland)/worlds/city_with_aruco.world"/>
+    </include>
+
+    <include file="$(find hector_quadrotor_gazebo)/launch/spawn_quadrotor.launch" >
+        <arg name="model" value="$(find hector_quadrotor_description)/urdf/quadrotor_with_cam.gazebo.xacro"/>
+        <arg name="controllers" value="
+            controller/attitude
+            controller/velocity
+            controller/position
+            "/>
+    </include>
+</launch>
