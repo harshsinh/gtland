@@ -1,4 +1,4 @@
-add_executable (detector_node src/detector2.cxx)
+add_executable (detector_node src/detector1.cxx)
 target_link_libraries (detector_node
 						${catkin_LIBRARIES}
 						${OpenCV_LIBRARIES}

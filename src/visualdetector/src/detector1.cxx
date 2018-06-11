@@ -8,6 +8,14 @@
 #include <cv_bridge/cv_bridge.h>
 
 cv::VideoCapture cap;
+cv::Mat frame;
+
+// Frame from topic subscription
+void image_cb (const sensor_msgs::ImageConstPtr& msg)
+{
+  frame = cv_bridge::toCvShare (msg) -> image;
+  return;
+}
 
 int main (int argc, char ** argv)
 {
@@ -19,25 +27,17 @@ int main (int argc, char ** argv)
 	image_transport::Publisher threshpub = it.advertise ("thresholded", 1);
 	image_transport::Publisher detectpub = it.advertise ("detected", 1);
     ros::Publisher pub = nh.advertise<geometry_msgs::Vector3>("/camera_pose", 100);
+    image_transport::Subscriber sub = it.subscribe ("/image", 100, image_cb);
 	ros::Rate loop_rate (500);
     geometry_msgs::Vector3 pixelCord;
 
     // cv stuff
-    cv::Mat frame;
     std::vector<std::vector<cv::Point> > contours;
     std::vector<cv::Vec4i> hierarchy;
     std::vector<double> area;
 
     // scaling factors
     double imScale = 1.00;
-
-	//camera choice
-	int camera = argv [1][0] - 48;
-
-	if (camera < 0)
-		ROS_ERROR_STREAM ("Not a valid camera address");
-
-	cap.open (camera);
 
 	cv::namedWindow ("color");
 	cv::startWindowThread();
@@ -50,15 +50,27 @@ int main (int argc, char ** argv)
 	cv::createTrackbar ("Blue High", "color", &bh, 255);
 	cv::createTrackbar ("Green High", "color", &gh, 255);
 
-	if (!cap.isOpened()) {
-		std::cout << "Unable to open camera "<< camera << std::endl;
-		ROS_ERROR_STREAM ("Unable to open camera");
-		return -1;
+
+
+	//camera choice
+	int camera = argv [1][0] - 48;
+
+	if (camera >= 0)
+    {
+	    cap.open (camera);
+
+	    if (!cap.isOpened()) {
+	    	std::cout << "Unable to open camera "<< camera << std::endl;
+	    	ROS_ERROR_STREAM ("Unable to open camera");
+	    	return -1;
+        }
     }
 
     while (nh.ok()) {
 
-        cap >> frame;
+        if (cap.isOpened())
+            cap >> frame;
+
         if (!frame.empty()) {
 
             cv::Scalar colorLow (bl, gl, rl);
@@ -91,17 +103,18 @@ int main (int argc, char ** argv)
                 float radius;
                 float& refrad = radius;
                 cv::minEnclosingCircle ((cv::Mat)contours[idx], circenter, refrad);
-                center = cv::Point2f( M.m10/M.m00 , M.m01/M.m00 );
+                // center = cv::Point2f( M.m10/M.m00 , M.m01/M.m00 );
+                center = cv::Point2f(2, 2);
 
                 std::cout << "radius : " << int(radius) << std::endl;
 
                 if (radius > 2.0 && radius < 225) {
-                    cv::putText (frame, std::to_string(radius), circenter/imScale, cv::FONT_HERSHEY_SIMPLEX, imScale, 0, 2);
-                    cv::circle (frame, circenter/imScale, int(radius/imScale), cv::Scalar(0, 255, 255), 2, 8, 0);
-                    pixelCord.x = int(circenter.x/imScale);
-                    pixelCord.y = int(circenter.y/imScale);
-                    pixelCord.z = int(radius/imScale);
-                    pub.publish (pixelCord);
+                    // cv::putText (frame, std::to_string(radius), circenter/imScale, cv::FONT_HERSHEY_SIMPLEX, imScale, 0, 2);
+                    // cv::circle (frame, circenter/imScale, int(radius/imScale), cv::Scalar(0, 255, 255), 2, 8, 0);
+                    // pixelCord.x = int(circenter.x/imScale);
+                    // pixelCord.y = int(circenter.y/imScale);
+                    // pixelCord.z = int(radius/imScale);
+                    // pub.publish (pixelCord);
                 }
                 area.clear();
             }
@@ -116,11 +129,6 @@ int main (int argc, char ** argv)
             // stop if "q" is pressed
             if (cv::waitKey(1) == 113)
             break;
-        }
-
-        else {
-            ROS_ERROR_STREAM ("No Image found!");
-            return -1;
         }
 
         ros::spinOnce();
