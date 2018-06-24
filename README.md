@@ -1,4 +1,4 @@
-# Autonomous Detection and Tracking of a High-Speed Ground Vehicle using a Quadrotor UAV
+## Autonomous Detection and Tracking of a High-Speed Ground Vehicle using a Quadrotor UAV
 
 This project presents 
 
